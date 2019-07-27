@@ -4,7 +4,7 @@ type Head<T extends any[], D = never> = T extends [infer X, ...any[]] ? X : D;
 
 export function useApi<T, A>(
   promise: (obj: A) => Promise<T>,
-  onResult?: (res: T) => void
+  onSuccess?: (res: NonNullable<T>) => void
 ) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -17,7 +17,7 @@ export function useApi<T, A>(
 
     setLoading(false);
     setresult(res);
-    onResult && onResult(res);
+    onSuccess && res && onSuccess(res!);
     return res;
   };
 

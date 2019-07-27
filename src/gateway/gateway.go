@@ -16,7 +16,7 @@ type CreateAnswerReq struct {
 
 type CreateAnswerRes struct {
 	SDP webrtc.SessionDescription `json:"sdp"`
-	UU  string                    `json:"string"`
+	UU  string                    `json:"uu"`
 }
 
 func CreateAnswerGateWay(c echo.Context) error {
