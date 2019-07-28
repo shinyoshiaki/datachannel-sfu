@@ -19,21 +19,32 @@ func Join(room string) (webrtc.SessionDescription, string, error) {
 	}
 
 	store.SetDatachannel(dc, room, uu)
+	sfu.Publish(dc, room, uu)
 
 	peer.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
 		if connectionState.String() == "disconnected" {
+			fmt.Println("disconnect", room, uu)
 			store.DeletePeer(room, uu)
 			store.DeleteDatachannel(room, uu)
 		}
+		if connectionState.String() == "connected" {
+			fmt.Println("connectedd")
+			dc.SendText("ping")
+		}
 	})
 
-	sfu.Publish(dc, room, uu)
+	peer.OnDataChannel(func(dc *webrtc.DataChannel) {
+		dc.OnOpen(func() {
+			fmt.Println("dc open")
+			store.SetDatachannel(dc, room, uu)
+			sfu.Publish(dc, room, uu)
+		})
+	})
 
 	return offer, uu, nil
 }
 
 func Answer(room string, uu string, TYPE string, SDP string) {
-	fmt.Println("type", TYPE)
 	peer := store.GetPeer(room, uu)
 	switch TYPE {
 	case "candidate":

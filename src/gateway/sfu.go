@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"data-sfu/src/usecase"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,7 +21,7 @@ type JoinRes struct {
 func Join(c echo.Context) error {
 	var req JoinReq
 	c.Bind(&req)
-
+	fmt.Println(req.ROOM)
 	sdp, uu, err := usecase.Join(req.ROOM)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "error")
@@ -40,7 +41,6 @@ type AnswerReq struct {
 func Answer(c echo.Context) error {
 	var req AnswerReq
 	c.Bind(&req)
-
 	usecase.Answer(req.ROOM, req.UU, req.TYPE, req.SDP)
 
 	return c.NoContent(http.StatusOK)
