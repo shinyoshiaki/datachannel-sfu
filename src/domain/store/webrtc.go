@@ -33,6 +33,11 @@ func GetPeers(room string) map[string]*webrtc.PeerConnection {
 	return groupe
 }
 
+func GetPeer(room string, uu string) *webrtc.PeerConnection {
+	peer := peers[room][uu]
+	return peer
+}
+
 var datachannels = make(map[string]map[string]*webrtc.DataChannel)
 
 func SetDatachannel(dc *webrtc.DataChannel, room string, uu string) {

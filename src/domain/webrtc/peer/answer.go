@@ -1,12 +1,10 @@
 package peer
 
 import (
-	"fmt"
-
 	"github.com/pion/webrtc/v2"
 )
 
-func createAnswerPeer() *webrtc.PeerConnection {
+func CreatePeer() (webrtc.SessionDescription, *webrtc.PeerConnection, *webrtc.DataChannel) {
 	config := webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
@@ -20,19 +18,20 @@ func createAnswerPeer() *webrtc.PeerConnection {
 		panic(err)
 	}
 
-	return peerConnection
-}
+	dc, err := peerConnection.CreateDataChannel("datachannel", nil)
+	if err != nil {
+		panic(err)
+	}
 
-func SetOffer(sdp webrtc.SessionDescription) (webrtc.SessionDescription, *webrtc.PeerConnection) {
-	peer := createAnswerPeer()
-	err := peer.SetRemoteDescription(sdp)
+	offer, err := peerConnection.CreateOffer(nil)
 	if err != nil {
 		panic(err)
 	}
-	answer, err := peer.CreateAnswer(nil)
+
+	err = peerConnection.SetLocalDescription(offer)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("setoffer")
-	return answer, peer
+
+	return offer, peerConnection, dc
 }

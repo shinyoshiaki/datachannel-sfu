@@ -19,19 +19,29 @@ const App: React.FC = () => {
 
         if (peer.isConnected) return null;
 
-        peer.makeOffer();
-        const { type, sdp } = await peer.onSignal.asPromise();
-        const res = await axios.post(target + "/join", { type, sdp, room });
-
-        return res.data as { sdp: any; uu: string };
+        const res = await axios.post<{ sdp: any; uu: string }>(
+          target + "/join",
+          {
+            room
+          }
+        );
+        const { sdp, uu } = res.data;
+        peer.setSdp(sdp);
+        await new Promise(r => {
+          peer.onSignal.subscribe(({ sdp, type }) => {
+            axios.post(target + "/answer", { type, sdp, room, uu });
+          });
+          peer.onConnect.once(r);
+        });
+        return { uu };
       }
     },
-    async ({ sdp }) => {
+    () => {
       const { peer } = state.current;
-      peer.setSdp(sdp);
-      await peer.onConnect.asPromise();
-      setlog("connected");
-      peer.onData.subscribe(v => typeof v.data === "string" && setlog(v.data));
+      peer.onData.subscribe(v => {
+        console.log({ v });
+        typeof v.data === "string" && setlog(v.data);
+      });
     }
   );
 
