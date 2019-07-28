@@ -31,10 +31,10 @@ func Join(c echo.Context) error {
 }
 
 type AnswerReq struct {
-	ROOM string         `json:"room"`
-	UU   string         `json:"uu"`
-	TYPE webrtc.SDPType `json:"type"`
-	SDP  string         `json:"sdp"`
+	ROOM string `json:"room"`
+	UU   string `json:"uu"`
+	TYPE string `json:"type"`
+	SDP  string `json:"sdp"`
 }
 
 func Answer(c echo.Context) error {

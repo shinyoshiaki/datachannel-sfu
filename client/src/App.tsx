@@ -8,7 +8,7 @@ import Send from "./components/send";
 const target = "http://localhost:8080";
 
 const App: React.FC = () => {
-  const state = useRef({ peer: new WebRTC() });
+  const state = useRef({ peer: new WebRTC({ trickle: true }) });
   const [log, setlog] = useState("");
   const [room, setroom] = useInput();
 
@@ -29,6 +29,7 @@ const App: React.FC = () => {
         peer.setSdp(sdp);
         await new Promise(r => {
           peer.onSignal.subscribe(({ sdp, type }) => {
+            console.log({ type });
             axios.post(target + "/answer", { type, sdp, room, uu });
           });
           peer.onConnect.once(r);
@@ -37,6 +38,7 @@ const App: React.FC = () => {
       }
     },
     () => {
+      console.log("connected");
       const { peer } = state.current;
       peer.onData.subscribe(v => {
         console.log({ v });

@@ -32,11 +32,25 @@ func Join(room string) (webrtc.SessionDescription, string, error) {
 	return offer, uu, nil
 }
 
-func Answer(room string, uu string, TYPE webrtc.SDPType, SDP string) {
-	sdp := webrtc.SessionDescription{Type: TYPE, SDP: SDP}
+func Answer(room string, uu string, TYPE string, SDP string) {
+	fmt.Println("type", TYPE)
 	peer := store.GetPeer(room, uu)
-	err := peer.SetRemoteDescription(sdp)
-	if err != nil {
-		panic(err)
+	switch TYPE {
+	case "candidate":
+		ice := webrtc.ICECandidateInit{Candidate: SDP}
+		peer.AddICECandidate(ice)
+	case "offer":
+		sdp := webrtc.SessionDescription{Type: webrtc.SDPTypeOffer, SDP: SDP}
+		err := peer.SetRemoteDescription(sdp)
+		if err != nil {
+			panic(err)
+		}
+	case "answer":
+		sdp := webrtc.SessionDescription{Type: webrtc.SDPTypeAnswer, SDP: SDP}
+		err := peer.SetRemoteDescription(sdp)
+		if err != nil {
+			panic(err)
+		}
 	}
+
 }
