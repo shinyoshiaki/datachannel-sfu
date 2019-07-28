@@ -9,7 +9,7 @@ import (
 
 func Publish(dc *webrtc.DataChannel, room string, uu string) {
 	dc.OnMessage(func(msg webrtc.DataChannelMessage) {
-		fmt.Println(msg)
+		fmt.Println("publish", string(msg.Data))
 		groupe := store.GetDatachannels(room)
 		for k, v := range groupe {
 			if k != uu {
