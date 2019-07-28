@@ -20,7 +20,7 @@ func main() {
 		type Ping struct {
 			Msg string `json:"msg"`
 		}
-		res := &Ping{Msg: "hello"}
+		res := &Ping{Msg: "pong"}
 		return c.JSON(http.StatusOK, res)
 	})
 	e.Logger.Fatal(e.Start(":8080"))

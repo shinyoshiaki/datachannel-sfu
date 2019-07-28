@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"data-sfu/src/domain/sfu"
 	"data-sfu/src/domain/store"
 	"data-sfu/src/domain/webrtc/peer"
 	"fmt"
@@ -8,16 +9,20 @@ import (
 	"github.com/pion/webrtc/v2"
 )
 
-func Join(TYPE webrtc.SDPType, SDP string) (webrtc.SessionDescription, string, error) {
-	sdp := webrtc.SessionDescription{}
-	sdp.Type = TYPE
-	sdp.SDP = SDP
+func Join(TYPE webrtc.SDPType, SDP string, room string) (webrtc.SessionDescription, string, error) {
+	sdp := webrtc.SessionDescription{Type: TYPE, SDP: SDP}
 	answer, peer := peer.SetOffer(sdp)
-	uu, err := store.SetPeer(peer)
+
+	fmt.Println("room", room)
+
+	uu, err := store.SetPeer(peer, room)
+
 	if err != nil {
 		fmt.Println("error", err)
 		return webrtc.SessionDescription{}, "", err
 	}
-	fmt.Println("answer", uu)
+
+	sfu.Publish(peer, room, uu)
+
 	return answer, uu, nil
 }

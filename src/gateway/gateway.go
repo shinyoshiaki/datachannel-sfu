@@ -12,6 +12,7 @@ import (
 type CreateAnswerReq struct {
 	TYPE webrtc.SDPType `json:"type"`
 	SDP  string         `json:"sdp"`
+	ROOM string         `json:"room"`
 }
 
 type CreateAnswerRes struct {
@@ -22,12 +23,13 @@ type CreateAnswerRes struct {
 func CreateAnswerGateWay(c echo.Context) error {
 	var req CreateAnswerReq
 	c.Bind(&req)
-	sdp, uu, err := usecase.Join(req.TYPE, req.SDP)
+
+	sdp, uu, err := usecase.Join(req.TYPE, req.SDP, req.ROOM)
 	if err != nil {
 		fmt.Println("error", err)
 		return c.String(http.StatusInternalServerError, "error")
 	}
+
 	res := &CreateAnswerRes{SDP: sdp, UU: uu}
-	fmt.Println("res")
 	return c.JSON(http.StatusOK, res)
 }
