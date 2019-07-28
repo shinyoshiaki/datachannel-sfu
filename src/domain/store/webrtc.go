@@ -24,6 +24,10 @@ func SetPeer(peer *webrtc.PeerConnection, room string) (string, error) {
 	return uu, nil
 }
 
+func DeletePeer(room string, uu string) {
+	peers[room][uu] = nil
+}
+
 func GetPeers(room string) map[string]*webrtc.PeerConnection {
 	groupe := peers[room]
 	return groupe
@@ -43,4 +47,8 @@ func SetDatachannel(dc *webrtc.DataChannel, room string, uu string) {
 func GetDatachannels(room string) map[string]*webrtc.DataChannel {
 	groupe := datachannels[room]
 	return groupe
+}
+
+func DeleteDatachannel(room string, uu string) {
+	datachannels[room][uu] = nil
 }

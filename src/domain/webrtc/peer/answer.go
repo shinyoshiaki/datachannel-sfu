@@ -20,10 +20,6 @@ func createAnswerPeer() *webrtc.PeerConnection {
 		panic(err)
 	}
 
-	peerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
-		fmt.Printf("ICE Connection State has changed: %s\n", connectionState.String())
-	})
-
 	return peerConnection
 }
 

@@ -17,6 +17,13 @@ func Join(TYPE webrtc.SDPType, SDP string, room string) (webrtc.SessionDescripti
 
 	uu, err := store.SetPeer(peer, room)
 
+	peer.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
+		if connectionState.String() == "disconnected" {
+			store.DeletePeer(room, uu)
+			store.DeleteDatachannel(room, uu)
+		}
+	})
+
 	if err != nil {
 		fmt.Println("error", err)
 		return webrtc.SessionDescription{}, "", err
