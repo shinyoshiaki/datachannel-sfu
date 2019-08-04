@@ -26,10 +26,11 @@ const App: React.FC = () => {
           }
         );
         const { sdp, uu } = res.data;
+        console.log({ sdp, uu });
         peer.setSdp(sdp);
         await new Promise(r => {
-          peer.onSignal.subscribe(({ sdp, type }) => {
-            console.log({ type });
+          peer.onSignal.subscribe(({ sdp, type, ice }) => {
+            sdp = sdp ? sdp : (ice as any);
             axios.post(target + "/answer", { type, sdp, room, uu });
           });
           peer.onConnect.once(r);
@@ -50,12 +51,12 @@ const App: React.FC = () => {
   return (
     <div>
       <input placeholder="room" onChange={setroom} />
-      <button onClick={fetch}>offer</button>
+      <button onClick={fetch}>join</button>
       {loading && <p>loading</p>}
       {error && <p>error</p>}
-      <p>{log}</p>
       {result && <p>{result.uu}</p>}
       <Send peer={state.current.peer} />
+      <p>{log}</p>
     </div>
   );
 };
