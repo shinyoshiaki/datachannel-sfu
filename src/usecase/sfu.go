@@ -18,30 +18,34 @@ func Join(room string) (webrtc.SessionDescription, string, error) {
 		return webrtc.SessionDescription{}, "", err
 	}
 
-	store.SetDatachannel(dc, room, uu)
-	sfu.Publish(dc, room, uu)
+	setupDatachannel(dc, room, uu)
 
 	peer.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
 		if connectionState.String() == "disconnected" {
 			fmt.Println("disconnect", room, uu)
 			store.DeletePeer(room, uu)
-			store.DeleteDatachannel(room, uu)
 		}
 		if connectionState.String() == "connected" {
-			fmt.Println("connectedd")
-			dc.SendText("ping")
+			fmt.Println("connectedd", room, uu)
 		}
 	})
 
 	peer.OnDataChannel(func(dc *webrtc.DataChannel) {
 		dc.OnOpen(func() {
-			fmt.Println("dc open")
-			store.SetDatachannel(dc, room, uu)
-			sfu.Publish(dc, room, uu)
+			setupDatachannel(dc, room, uu)
 		})
 	})
 
 	return offer, uu, nil
+}
+
+func setupDatachannel(dc *webrtc.DataChannel, room string, uu string) {
+	fmt.Println("dc opened", dc.ReadyState().String())
+	store.SetDatachannel(dc, room, uu)
+	sfu.Publish(dc, room, uu, func(err error) {
+		fmt.Println("dc diconnect", err)
+		store.DeletePeer(room, uu)
+	})
 }
 
 func Answer(room string, uu string, TYPE string, SDP string) {

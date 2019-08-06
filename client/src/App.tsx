@@ -10,7 +10,7 @@ const target = "http://localhost:8080";
 const App: React.FC = () => {
   const state = useRef({ peer: new WebRTC({ trickle: true }) });
   const [log, setlog] = useState("");
-  const [room, setroom] = useInput();
+  const [room, setroom] = useInput("a");
 
   const { fetch, loading, error, result } = useApi(
     async () => {
@@ -26,7 +26,6 @@ const App: React.FC = () => {
           }
         );
         const { sdp, uu } = res.data;
-        console.log({ sdp, uu });
         peer.setSdp(sdp);
         await new Promise(r => {
           peer.onSignal.subscribe(({ sdp, type, ice }) => {
@@ -50,7 +49,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <input placeholder="room" onChange={setroom} />
+      <input placeholder="room" onChange={setroom} value={room} />
       <button onClick={fetch}>join</button>
       {loading && <p>loading</p>}
       {error && <p>error</p>}
