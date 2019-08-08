@@ -17,6 +17,4 @@ RUN CGO_ENABLED=0 go build -o /go/bin/go-app
 FROM scratch
 COPY --from=build-step /go/bin/go-app /usr/local/bin/
 
-EXPOSE 8088
-
 CMD ["go-app"]

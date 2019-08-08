@@ -2,5 +2,4 @@ version: "2"
 services:
   app:
     build: .
-    ports:
-      - "8088:8088"
+    network_mode: "host"
