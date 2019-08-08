@@ -5,7 +5,7 @@ import { useApi } from "./hooks/useApi";
 import useInput from "./hooks/useInput";
 import Send from "./components/send";
 
-const target = "http://localhost:8080";
+const target = "http://localhost:8088";
 
 const App: React.FC = () => {
   const state = useRef({ peer: new WebRTC({ trickle: true }) });

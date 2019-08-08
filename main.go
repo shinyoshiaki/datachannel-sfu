@@ -16,6 +16,6 @@ func main() {
 	e.Use(middleware.CORS())
 	e.POST("/join", gateway.Join)
 	e.POST("/answer", gateway.Answer)
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":8088"))
 
 }
