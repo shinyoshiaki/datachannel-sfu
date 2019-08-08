@@ -5,7 +5,10 @@ import { useApi } from "./hooks/useApi";
 import useInput from "./hooks/useInput";
 import Send from "./components/send";
 
-const target = "http://localhost:8088";
+const url =
+  process.env.NODE_ENV === "production"
+    ? "http://34.73.92.59:8088"
+    : "http://localhost:8088";
 
 const App: React.FC = () => {
   const state = useRef({ peer: new WebRTC({ trickle: true }) });
@@ -19,18 +22,15 @@ const App: React.FC = () => {
 
         if (peer.isConnected) return null;
 
-        const res = await axios.post<{ sdp: any; uu: string }>(
-          target + "/join",
-          {
-            room
-          }
-        );
+        const res = await axios.post<{ sdp: any; uu: string }>(url + "/join", {
+          room
+        });
         const { sdp, uu } = res.data;
         peer.setSdp(sdp);
         await new Promise(r => {
           peer.onSignal.subscribe(({ sdp, type, ice }) => {
             sdp = sdp ? sdp : (ice as any);
-            axios.post(target + "/answer", { type, sdp, room, uu });
+            axios.post(url + "/answer", { type, sdp, room, uu });
           });
           peer.onConnect.once(r);
         });
