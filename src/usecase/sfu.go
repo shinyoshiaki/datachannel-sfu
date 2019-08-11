@@ -48,24 +48,27 @@ func setupDatachannel(dc *webrtc.DataChannel, room string, uu string) {
 	})
 }
 
-func Answer(room string, uu string, TYPE string, SDP string) {
+func Answer(room string, uu string, TYPE string, SDP string) error {
 	peer := store.GetPeer(room, uu)
 	switch TYPE {
 	case "candidate":
 		ice := webrtc.ICECandidateInit{Candidate: SDP}
-		peer.AddICECandidate(ice)
+		err := peer.AddICECandidate(ice)
+		if err != nil {
+			return err
+		}
 	case "offer":
 		sdp := webrtc.SessionDescription{Type: webrtc.SDPTypeOffer, SDP: SDP}
 		err := peer.SetRemoteDescription(sdp)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	case "answer":
 		sdp := webrtc.SessionDescription{Type: webrtc.SDPTypeAnswer, SDP: SDP}
 		err := peer.SetRemoteDescription(sdp)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
-
+	return nil
 }

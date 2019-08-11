@@ -1,47 +1,37 @@
 package gateway
 
 import (
-	"data-sfu/src/usecase"
+	"data-sfu/src/controller"
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pion/webrtc/v2"
 )
 
-type JoinReq struct {
-	ROOM string `json:"room"`
-}
-
-type JoinRes struct {
-	SDP webrtc.SessionDescription `json:"sdp"`
-	UU  string                    `json:"uu"`
-}
-
 func Join(c echo.Context) error {
-	var req JoinReq
+	var req controller.JoinReq
 	c.Bind(&req)
-	fmt.Println(req.ROOM)
-	sdp, uu, err := usecase.Join(req.ROOM)
+	fmt.Println(req)
+
+	res, err := controller.Join(req)
+
 	if err != nil {
-		return c.String(http.StatusInternalServerError, "error")
+		return c.String(http.StatusInternalServerError, err.Error())
 	}
 
-	res := &JoinRes{SDP: sdp, UU: uu}
 	return c.JSON(http.StatusOK, res)
 }
 
-type AnswerReq struct {
-	ROOM string `json:"room"`
-	UU   string `json:"uu"`
-	TYPE string `json:"type"`
-	SDP  string `json:"sdp"`
-}
-
 func Answer(c echo.Context) error {
-	var req AnswerReq
+	var req controller.AnswerReq
 	c.Bind(&req)
-	usecase.Answer(req.ROOM, req.UU, req.TYPE, req.SDP)
+	fmt.Println(req)
+
+	err := controller.Answer(req)
+
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
 
 	return c.NoContent(http.StatusOK)
 }
