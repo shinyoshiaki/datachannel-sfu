@@ -43,24 +43,33 @@ func GetPeer(room string, uu string) *webrtc.PeerConnection {
 	return peer
 }
 
-var datachannels = make(map[string]map[string]*webrtc.DataChannel)
+var datachannels = make(map[string]map[string]map[string]*webrtc.DataChannel)
 
-func SetDatachannel(dc *webrtc.DataChannel, room string, uu string) {
+func SetDatachannel(dc *webrtc.DataChannel, room string, label string, uu string) {
 	_, exist := datachannels[room]
 	if exist == false {
-		datachannels[room] = make(map[string]*webrtc.DataChannel)
+		datachannels[room] = make(map[string]map[string]*webrtc.DataChannel)
+	}
+	_, exist = datachannels[room][label]
+	if exist == false {
+		datachannels[room][label] = make(map[string]*webrtc.DataChannel)
 	}
 
-	datachannels[room][uu] = dc
+	datachannels[room][label][uu] = dc
 }
 
-func GetDatachannels(room string) map[string]*webrtc.DataChannel {
-	groupe := datachannels[room]
+func GetDatachannels(room string, label string) map[string]*webrtc.DataChannel {
+	groupe := datachannels[room][label]
 	return groupe
 }
 
 func deleteDatachannel(room string, uu string) {
-	delete(datachannels[room], uu)
+	for label := range datachannels[room] {
+		delete(datachannels[room][label], uu)
+		if len(datachannels[room][label]) == 0 {
+			delete(datachannels[room], label)
+		}
+	}
 	if len(datachannels[room]) == 0 {
 		delete(datachannels, room)
 	}

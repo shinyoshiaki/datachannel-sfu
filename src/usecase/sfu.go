@@ -4,23 +4,26 @@ import (
 	"data-sfu/src/domain/sfu"
 	"data-sfu/src/domain/store"
 	"data-sfu/src/domain/webrtc/peer"
+	"encoding/json"
 	"fmt"
 
 	"github.com/pion/webrtc/v2"
 )
 
 func Join(room string) (webrtc.SessionDescription, string, error) {
-	offer, peer, dc := peer.CreatePeer()
 
-	uu, err := store.SetPeer(peer, room)
+	create := make(chan peer.CreatePeerRes)
+	dcOpen := make(chan bool)
+	go peer.CreatePeer(create, dcOpen)
+	res := <-create
+
+	uu, err := store.SetPeer(res.Peer, room)
 	if err != nil {
 		fmt.Println("error", err)
 		return webrtc.SessionDescription{}, "", err
 	}
 
-	setupDatachannel(dc, room, uu)
-
-	peer.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
+	res.Peer.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
 		if connectionState.String() == "disconnected" {
 			fmt.Println("disconnect", room, uu)
 			store.DeletePeer(room, uu)
@@ -30,45 +33,44 @@ func Join(room string) (webrtc.SessionDescription, string, error) {
 		}
 	})
 
-	peer.OnDataChannel(func(dc *webrtc.DataChannel) {
-		dc.OnOpen(func() {
-			setupDatachannel(dc, room, uu)
-		})
+	setupDatachannel(res.DC, res.Peer, room, uu)
+	res.DC.OnOpen(func() {
+		dcOpen <- true
 	})
 
-	return offer, uu, nil
+	res.Peer.OnDataChannel(func(dc *webrtc.DataChannel) {
+		setupDatachannel(dc, res.Peer, room, uu)
+	})
+
+	return res.Offer, uu, nil
 }
 
-func setupDatachannel(dc *webrtc.DataChannel, room string, uu string) {
-	fmt.Println("dc opened", dc.ReadyState().String())
-	store.SetDatachannel(dc, room, uu)
-	sfu.Publish(dc, room, uu, func(err error) {
-		fmt.Println("dc diconnect", err)
-		store.DeletePeer(room, uu)
-	})
+func setupDatachannel(dc *webrtc.DataChannel, pc *webrtc.PeerConnection, room string, uu string) {
+	store.SetDatachannel(dc, room, dc.Label(), uu)
+
+	onsdp := make(chan peer.Sdp)
+	go peer.Listen(pc, onsdp)
+
+	sfu.Publish(dc, room, uu,
+		func(err error) {
+			fmt.Println("dc diconnect", err)
+			store.DeletePeer(room, uu)
+		},
+		func(data []byte) {
+			var sdp peer.Sdp
+			json.Unmarshal(data, &sdp)
+			onsdp <- sdp
+		})
 }
 
 func Answer(room string, uu string, TYPE string, SDP string) error {
-	peer := store.GetPeer(room, uu)
-	switch TYPE {
-	case "candidate":
-		ice := webrtc.ICECandidateInit{Candidate: SDP}
-		err := peer.AddICECandidate(ice)
-		if err != nil {
-			return err
-		}
-	case "offer":
-		sdp := webrtc.SessionDescription{Type: webrtc.SDPTypeOffer, SDP: SDP}
-		err := peer.SetRemoteDescription(sdp)
-		if err != nil {
-			return err
-		}
-	case "answer":
-		sdp := webrtc.SessionDescription{Type: webrtc.SDPTypeAnswer, SDP: SDP}
-		err := peer.SetRemoteDescription(sdp)
-		if err != nil {
-			return err
-		}
+	pc := store.GetPeer(room, uu)
+	sdp := &peer.Sdp{Type: TYPE, Sdp: SDP}
+	err := peer.SetSDP(sdp, pc)
+
+	if err != nil {
+		return err
 	}
+
 	return nil
 }
