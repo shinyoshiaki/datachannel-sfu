@@ -1219,6 +1219,13 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
+"@msgpack/msgpack@^1.6.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@msgpack/msgpack/-/msgpack-1.8.0.tgz#274ea5fbd9022119bba3e4ecf0aba89398a85fe7"
+  integrity sha512-8Mq4W7tXVg4JI6uzRcDHvTMUbMPuSBnY49zdo/gV0AsaThLpQLcEw6nkkBlvwaM0J6/SwB3VpwkXB54TpthYhA==
+  dependencies:
+    base64-js "^1.3.0"
+
 "@nodelib/fs.stat@^1.0.1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.2.tgz#54c5a964462be3d4d78af631363c18d6fa91ac26"
@@ -2165,6 +2172,11 @@ base64-js@^1.0.2:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.3.0.tgz#cab1e6118f051095e58b5281aea8c1cd22bfc0e3"
   integrity sha512-ccav/yGvoa80BQDljCxsmmQ3Xvx60/UpBIij5QN21W3wBi/hhIC9OoO+KLpu9IJTS9j4DRVJ3aDDF9cMSoa2lw==
+
+base64-js@^1.3.0:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.3.1.tgz#58ece8cb75dd07e71ed08c736abc5fac4dbf8df1"
+  integrity sha512-mLQ4i2QO1ytvGWFWmcngKO//JXAQueZvwEKtjgQFM4jIK0kU+ytMfplL8j+n5mspOfjHwoAg+9yhb7BwAHm36g==
 
 base@^0.11.1:
   version "0.11.2"
@@ -10180,11 +10192,12 @@ webpack@4.29.6:
     watchpack "^1.5.0"
     webpack-sources "^1.3.0"
 
-webrtc4me@^0.6.5:
-  version "0.6.5"
-  resolved "https://registry.yarnpkg.com/webrtc4me/-/webrtc4me-0.6.5.tgz#08df9c79d9dee3cffd888bf2ed753c7cb53531ea"
-  integrity sha512-kcszQu32n79cnkch0vPip8QGZCYtgAZY0k+U4pmeMYq+YuLjGuBjTa4jbXz2VPK4cQ1NcxpGHS6JODPLpzbZtA==
+webrtc4me@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/webrtc4me/-/webrtc4me-0.7.0.tgz#23059c58965de8b2be4b60ddf7aa09e82cd3e5c7"
+  integrity sha512-Ds5f4UlT8DGpEhRYHfWQt3wL/7PZVoMBnpV4MlRD6EMWu67EVWpoWLmnAL1734lqPMYdnPVzwtUjNQeg477psg==
   dependencies:
+    "@msgpack/msgpack" "^1.6.0"
     rx.mini "^0.1.0"
 
 websocket-driver@>=0.5.1:

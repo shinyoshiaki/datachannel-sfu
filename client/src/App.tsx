@@ -4,6 +4,7 @@ import WebRTC from "webrtc4me";
 import { useApi } from "./hooks/useApi";
 import useInput from "./hooks/useInput";
 import Send from "./components/send";
+import SfuVideo from "./containers/sfu-video";
 
 const url =
   process.env.NODE_ENV === "production"
@@ -42,7 +43,6 @@ const App: React.FC = () => {
       console.log("connected");
       const { peer } = state.current;
       peer.onData.subscribe(v => {
-        console.log({ v });
         typeof v.data === "string" && setlog(v.data);
       });
     }
@@ -57,6 +57,7 @@ const App: React.FC = () => {
       {result && <p>{result.uu}</p>}
       <Send peer={state.current.peer} />
       <p>{log}</p>
+      <SfuVideo peer={state.current.peer} />
     </div>
   );
 };
