@@ -20,11 +20,11 @@ func Join(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func Answer(c echo.Context) error {
-	var req controller.AnswerReq
+func Signaling(c echo.Context) error {
+	var req controller.SignalingReq
 	c.Bind(&req)
 
-	err := controller.Answer(req)
+	err := controller.Signaling(req)
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())

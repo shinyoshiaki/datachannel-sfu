@@ -33,7 +33,10 @@ func CreatePeer(ready chan CreatePeerRes, dcOpen chan bool) {
 	m.RegisterCodec(webrtc.NewRTPVP8Codec(webrtc.DefaultPayloadTypeVP8, 90000))
 	m.RegisterCodec(webrtc.NewRTPOpusCodec(webrtc.DefaultPayloadTypeOpus, 48000))
 
-	api := webrtc.NewAPI(webrtc.WithMediaEngine(m))
+	s := webrtc.SettingEngine{}
+	s.SetTrickle(true)
+
+	api := webrtc.NewAPI(webrtc.WithMediaEngine(m), webrtc.WithSettingEngine((s)))
 
 	peerConnection, err := api.NewPeerConnection(config)
 	if err != nil {
@@ -88,11 +91,15 @@ func CreatePeer(ready chan CreatePeerRes, dcOpen chan bool) {
 		panic(err)
 	}
 
+	peerConnection.OnICECandidate(func(candidate *webrtc.ICECandidate) {
+		if candidate != nil {
+			fmt.Println("update", candidate.String())
+		}
+	})
+
 	ready <- CreatePeerRes{Offer: offer, Peer: peerConnection, DC: dc}
 
 	<-dcOpen
 	fmt.Println("dcopen")
-	peerConnection.OnICECandidate(func(candidate *webrtc.ICECandidate) {
-		fmt.Println("update", candidate.String())
-	})
+
 }

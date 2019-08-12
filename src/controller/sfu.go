@@ -26,15 +26,15 @@ func Join(req JoinReq) (*JoinRes, error) {
 	return res, nil
 }
 
-type AnswerReq struct {
+type SignalingReq struct {
 	ROOM string `json:"room"`
 	UU   string `json:"uu"`
 	TYPE string `json:"type"`
 	SDP  string `json:"sdp"`
 }
 
-func Answer(req AnswerReq) error {
-	err := usecase.Answer(req.ROOM, req.UU, req.TYPE, req.SDP)
+func Signaling(req SignalingReq) error {
+	err := usecase.Signaling(req.ROOM, req.UU, req.TYPE, req.SDP)
 
 	if err != nil {
 		return err

@@ -8,6 +8,6 @@ import (
 
 func Listen(peer *webrtc.PeerConnection, sdpReady chan Sdp) {
 	sdp := <-sdpReady
-	fmt.Println("onsdp", sdp.Type, sdp.Sdp)
+	fmt.Println("onsdp", sdp.Type)
 	SetSDP(&sdp, peer)
 }

@@ -63,7 +63,7 @@ func setupDatachannel(dc *webrtc.DataChannel, pc *webrtc.PeerConnection, room st
 		})
 }
 
-func Answer(room string, uu string, TYPE string, SDP string) error {
+func Signaling(room string, uu string, TYPE string, SDP string) error {
 	pc := store.GetPeer(room, uu)
 	sdp := &peer.Sdp{Type: TYPE, Sdp: SDP}
 	err := peer.SetSDP(sdp, pc)

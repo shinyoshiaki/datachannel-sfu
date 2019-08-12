@@ -32,7 +32,7 @@ const App: React.FC = () => {
           peer.onSignal.subscribe(({ sdp, type, ice }) => {
             sdp = sdp ? sdp : (ice!.candidate as any);
             console.log({ sdp });
-            axios.post(url + "/answer", { type, sdp, room, uu });
+            axios.post(url + "/signaling", { type, sdp, room, uu });
           });
           peer.onConnect.once(r);
         });
