@@ -7,9 +7,13 @@ import (
 	"github.com/pion/webrtc/v2"
 )
 
-func Publish(dc *webrtc.DataChannel, room string, uu string, onError func(error)) {
+func Publish(dc *webrtc.DataChannel, room string, uu string, onError func(error), onUpdate func([]byte)) {
 	dc.OnMessage(func(msg webrtc.DataChannelMessage) {
-		groupe := store.GetDatachannels(room)
+		groupe := store.GetDatachannels(room, dc.Label())
+		if dc.Label() == "update" {
+			onUpdate(msg.Data)
+			return
+		}
 		fmt.Println("publish", string(msg.Data))
 		for k, v := range groupe {
 			if k != uu && v != nil {

@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"data-sfu/src/controller"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,7 +10,6 @@ import (
 func Join(c echo.Context) error {
 	var req controller.JoinReq
 	c.Bind(&req)
-	fmt.Println(req)
 
 	res, err := controller.Join(req)
 
@@ -22,12 +20,11 @@ func Join(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func Answer(c echo.Context) error {
-	var req controller.AnswerReq
+func Signaling(c echo.Context) error {
+	var req controller.SignalingReq
 	c.Bind(&req)
-	fmt.Println(req)
 
-	err := controller.Answer(req)
+	err := controller.Signaling(req)
 
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
